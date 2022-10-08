@@ -338,12 +338,35 @@ open class BMPlayer: UIView {
     
     @objc fileprivate func fullScreenButtonPressed() {
         controlView.updateUI(!self.isFullScreen)
-        if isFullScreen {
-            UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+         if isFullScreen {
+            if #available(iOS 16.0, *) {
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                    windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .portrait)){
+                        error in
+                    }
+                })
+                
+            }
+            else {
+                UIDevice.current.setValue(UIInterfaceOrientation.portrait.rawValue, forKey: "orientation")
+            }
             UIApplication.shared.setStatusBarHidden(false, with: .fade)
             UIApplication.shared.statusBarOrientation = .portrait
         } else {
-            UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+            if #available(iOS 16.0, *) {
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: {
+                    windowScene.requestGeometryUpdate(.iOS(interfaceOrientations: .landscapeRight)){
+                        error in
+                    }
+                })
+                
+            }
+            else {
+                UIDevice.current.setValue(UIInterfaceOrientation.landscapeRight.rawValue, forKey: "orientation")
+            }
+            
             UIApplication.shared.setStatusBarHidden(false, with: .fade)
             UIApplication.shared.statusBarOrientation = .landscapeRight
         }
